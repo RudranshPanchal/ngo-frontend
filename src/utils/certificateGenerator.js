@@ -27,11 +27,11 @@ export const updateCertificateStatus = async (id) => {
   return resp.data.certificate;
 };
 
-// ⭐ FIXED FUNCTION NAME — THIS MATCHES YOUR IMPORT
+//  FIXED FUNCTION NAME — THIS MATCHES YOUR IMPORT
 export const generateCertificatePDF = async (id) => {
   const resp = await api.get(`/api/certificate/pdf/${id}`, {
     responseType: "blob", // Very important
   });
 
-  return resp.data; // PDF blob
+  return resp.data; 
 };

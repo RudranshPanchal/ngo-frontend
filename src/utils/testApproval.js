@@ -1,4 +1,3 @@
-// Test function to verify approval flow
 export const testApprovalFlow = () => {
   // Create a test application
   const testApp = {

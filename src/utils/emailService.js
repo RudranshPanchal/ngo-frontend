@@ -50,22 +50,3 @@ export const emailService = {
 };
 
 
-//  Send OTP
-export const sendOtp = (email, role) => {
-  return api.post("/api/auth/forgotPassword", { email, role });
-};
-
-//  Verify OTP
-export const verifyOtp = (email, otp, role) => {
-  return api.post("/api/auth/verifyResetOtp", { email, otp, role });
-};
-
-//  Reset Password
-export const resetPassword = (email, newPassword, role) => {
-  return api.post("/api/auth/resetPassword", {
-    email,
-    newPassword,
-    confirm_password: newPassword,
-    role,
-  });
-};

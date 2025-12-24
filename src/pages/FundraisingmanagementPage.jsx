@@ -34,7 +34,7 @@ const FundraisingManagementPage = () => {
     };
   
 
-  // ---------------------- SUBMIT FORM ----------------------
+  // SUBMIT FORM
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -177,7 +177,7 @@ const confirmDelete = async () => {
         </div>
       </div>
 
-      {/* ---------- MODAL FORM ---------- */}
+      {/* MODAL FORM */}
     {showForm && (
   <div className="absolute inset-0 bg-white flex justify-center overflow-y-auto p-6">
     <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-6">

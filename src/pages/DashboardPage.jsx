@@ -55,7 +55,6 @@ const DashboardPage = () => {
           'Content-Type': 'application/json'
         }
       });
-
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -70,7 +69,6 @@ const DashboardPage = () => {
           'Content-Type': 'application/json'
         }
       });
-
       if (activityResponse.ok) {
         const activityData = await activityResponse.json();
         if (activityData.success) {
@@ -96,7 +94,6 @@ const DashboardPage = () => {
     setIsLoading(true);
     loadRealTimeData();
     setIsLoading(false);
-
     // Listen for storage changes
     const handleStorageChange = () => {
       loadRealTimeData();
@@ -125,7 +122,6 @@ const DashboardPage = () => {
           const programs = JSON.parse(localStorage.getItem('beneficiaryPrograms') || '[]');
           const certificates = JSON.parse(localStorage.getItem('beneficiaryCertificates') || '[]');
           const events = JSON.parse(localStorage.getItem('availableEvents') || '[]');
-
           setBeneficiaryData({ programs, certificates, events });
         } catch (error) {
           console.error('Error fetching beneficiary data:', error);
@@ -133,7 +129,6 @@ const DashboardPage = () => {
           setDataLoading(false);
         }
       };
-
 
       fetchBeneficiaryData();
     }
@@ -179,7 +174,6 @@ const DashboardPage = () => {
       trendUp: true
     }
   ];
-
 
   // Full-page loading state
   if (isLoading) {
@@ -253,7 +247,6 @@ const DashboardPage = () => {
           return <DonorDashboard />;
       }
     }
-
     // Beneficiary-specific content
     if (currentUser?.role === 'beneficiary') {
       switch (activeTab) {
@@ -413,7 +406,6 @@ const DashboardPage = () => {
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, Admin!</h1>
                   <p className="text-gray-600">Access your programs and support services.</p>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('my-programs')}>
                     <CardContent className="p-6 text-center">
@@ -424,7 +416,6 @@ const DashboardPage = () => {
                       <p className="text-sm text-gray-600">View enrolled programs and services</p>
                     </CardContent>
                   </Card>
-
                   <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('my-certificates')}>
                     <CardContent className="p-6 text-center">
                       <div className="p-3 rounded-full bg-green-100 w-fit mx-auto mb-4">
@@ -434,7 +425,6 @@ const DashboardPage = () => {
                       <p className="text-sm text-gray-600">View earned certificates</p>
                     </CardContent>
                   </Card>
-
                   <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => setActiveTab('available-events')}>
                     <CardContent className="p-6 text-center">
                       <div className="p-3 rounded-full bg-purple-100 w-fit mx-auto mb-4">
@@ -450,7 +440,6 @@ const DashboardPage = () => {
           );
       }
     }
-
     // Admin dashboard (existing content)
     return (
       <div className="p-4 sm:p-6">
@@ -784,7 +773,6 @@ const DashboardPage = () => {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         {/* Dashboard Header */}
@@ -803,7 +791,6 @@ const DashboardPage = () => {
             {renderContent()}
           </div>
         </div>
-
       </div>
     </div>
   );

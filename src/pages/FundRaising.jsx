@@ -12,13 +12,10 @@ function FundRaising() {
   const { cards, loading } = useFundraising();
 
 
-  // if (loading)
-  //   return <p className="text-center mt-10 text-gray-600">Loading...</p>;
 
   return (
     <div className="w-full flex flex-col items-center gap-6">
 
-      {/* Back Button aligned to RIGHT of Card */}
       {/* Bigger Back Button - LEFT */}
       <div className="w-full max-w-2xl flex justify-start">
         <Link
@@ -92,7 +89,6 @@ function FundRaising() {
                         fundraisingId: item._id,
                         presetAmount: "", // empty so input ENABLE rahe
                       }}
-                    // state={{ donationAmount: item.payment, fundraisingId: item._id }}
 
                     >
                       <Button

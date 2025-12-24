@@ -28,9 +28,7 @@ const [deleteId, setDeleteId] = useState(null);
     setDeleteId(id);
     setShowDeleteConfirm(true);
   };
-    // ----------------------------------
-    // ✅ FETCH GALLERY FROM BACKEND
-    // ----------------------------------
+    // FETCH GALLERY FROM BACKEND
     useEffect(() => {
         const loadGallery = async () => {
             try {
@@ -49,9 +47,7 @@ const [deleteId, setDeleteId] = useState(null);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
-    // ----------------------------------
-    // ❌ DELETE GALLERY ITEM
-    // ----------------------------------
+    // DELETE GALLERY ITEM
     const handleDeleteConfirm = async () => {
   try {
     await api.delete(`/api/gallery/deleteGallery/${deleteId}`);
@@ -67,9 +63,7 @@ const [deleteId, setDeleteId] = useState(null);
 };
 
 
-    // ---------------------------------
-    // ✅ CREATE GALLERY ITEM
-    // ----------------------------------
+    //  CREATE GALLERY ITEM
    const handleSubmit = async (event) => {
   event.preventDefault();
   setIsLoading(true);
@@ -84,14 +78,13 @@ const [deleteId, setDeleteId] = useState(null);
     formData.galleryImages.forEach(img => form.append("galleryImages", img));
     formData.youtubeVideo.forEach(v => form.append("youtubeVideo", v));
 
-    // 🔴 Yahan se token nikal ke manually header me bhej rahe
+    //  Yahan se token nikal ke manually header me bhej rahe
     const token = localStorage.getItem("token");
     console.log("TOKEN USED FOR GALLERY:", token);
 
     await api.post("/api/gallery/createGallery", form, {
       headers: {
-        Authorization: `Bearer ${token}`,        // <- important
-        // 'Content-Type' FormData khud set karega, isko mat chhedna
+        Authorization: `Bearer ${token}`,        
       },
     });
 
@@ -241,9 +234,7 @@ const [deleteId, setDeleteId] = useState(null);
                 </div>
             </div>
 
-            {/* -------------------------- */}
             {/* ADD GALLERY MODAL */}
-            {/* -------------------------- */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="max-w-2xl w-full mx-auto max-h-[85vh] overflow-y-auto scrollbar-hide">

@@ -1,4 +1,3 @@
-// userReportGenerator.js
 import { useState, useRef } from "react";
 import { marked } from "marked";
 import { generateReportAPI, downloadPDFAPI } from "../services/auditReportService";
