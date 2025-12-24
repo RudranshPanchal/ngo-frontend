@@ -22,6 +22,7 @@ import {
     User,
     FileCheck,
     Receipt,
+    Lock,
     Scale,
     Images,
     CircleDollarSign
@@ -29,7 +30,19 @@ import {
 import foundation2 from '../assets/Foundation2.png';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
+
     const { currentUser, setCurrentUser, sidebarOpen, setSidebarOpen } = useAppContext();
+    const isVolunteer = currentUser?.role === "volunteer";
+    const isVerified = currentUser?.emailVerified && currentUser?.phoneVerified;
+
+    const isItemLocked = (item) => {
+        if (!isVolunteer) return false;        // admins, donors unaffected
+        if (isVerified) return false;          // verified volunteers ok
+
+        // pending volunteer
+        return item.id !== "volunteer-profile";
+    };
+
 
 
     const { language } = useLanguage();
@@ -95,10 +108,10 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         {
             id: 'fundraising-management',
             label: 'Fundraising',
-            icon:  CircleDollarSign,
+            icon: CircleDollarSign,
             roles: ['admin']
         },
-        
+
 
         // Volunteer Menu Items
         {
@@ -108,26 +121,27 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             roles: ['volunteer']
         },
         {
-            id: 'volunteer-profile',
-            label: 'My Profile',
-            icon: UserCheck,
-            roles: ['volunteer']
-        },
-        {
             id: 'volunteer-events',
             label: 'Events',
             icon: Calendar,
             roles: ['volunteer']
         },
-
+        
         {
             id: 'volunteer-registration',
             label: 'Volunteer With Us',
             icon: Calendar,
             roles: ['volunteer']
         },
-
-
+        {
+            id: 'volunteer-profile',
+            label: 'My Profile',
+            icon: UserCheck,
+            roles: ['volunteer']
+        },
+        
+        
+        
 
 
         // Donor Menu Items
@@ -199,8 +213,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             case 'certificate-management':
                 navigate('/certificate-management');
                 break;
-                 case 'fundraising-management':
-              navigate('/fundraising-management');
+            case 'fundraising-management':
+                navigate('/fundraising-management');
                 break;
             case 'beneficiary-management':
                 navigate('/beneficiary-management');
@@ -253,18 +267,32 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                     <div className="space-y-1">
                         {filteredMenuItems.map((item) => {
                             const Icon = item.icon;
+                            const locked = isItemLocked(item);
                             return (
                                 <Button
                                     key={item.id}
                                     variant={activeTab === item.id ? 'default' : 'ghost'}
+                                    disabled={locked}
                                     className={cn(
-                                        'w-full justify-start cursor-pointer text-sm py-2 px-3',
-                                        activeTab === item.id && 'bg-purple-100 text-purple-900 hover:bg-purple-200'
+                                        'w-full justify-start text-sm py-2 px-3',
+                                        locked
+                                            ? 'cursor-not-allowed opacity-50'
+                                            : 'cursor-pointer',
+                                        activeTab === item.id &&
+                                        !locked &&
+                                        'bg-purple-100 text-purple-900 hover:bg-purple-200'
                                     )}
-                                    onClick={() => handleMenuClick(item.id)}
+                                    onClick={() => {
+                                        if (locked) return;
+                                        handleMenuClick(item.id);
+                                    }}
                                 >
                                     <Icon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                    {/* {Icon && <Icon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />} */}
                                     <span className="text-xs sm:text-sm">{item.label}</span>
+                                    {locked && (
+                                        <Lock className="ml-auto h-5 w-4 text-gray-600" />
+                                    )}
                                 </Button>
                             );
                         })}

@@ -39,8 +39,8 @@ const VolunteerProfile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      console.log("loffoo")
-      const token =await localStorage.getItem('authToken');
+      console.log("Volunteer Profile Fetching");
+      const token = await localStorage.getItem('authToken');
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
       if (!token) {
@@ -49,16 +49,16 @@ const VolunteerProfile = () => {
         setIsLoading(false);
         return;
       }
-console.log("-------------",token)
-      const response = await axios.get(import.meta.env.VITE_BACKEND_URL +'/api/auth/profile', {
+      console.log("-------------", token)
+      const response = await axios.get(import.meta.env.VITE_BACKEND_URL + '/api/auth/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      }).then((res)=>{
-        const data=res.data;
-         setProfile(data.user);
-          setEditedProfile(data.user);
+      }).then((res) => {
+        const data = res.data;
+        setProfile(data.user);
+        setEditedProfile(data.user);
       })
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -82,25 +82,25 @@ console.log("-------------",token)
         alert('Authentication required');
         return;
       }
-      console.log("---",token)
+      console.log("---", token)
       const response = await axios.put(
-       import.meta.env.VITE_BACKEND_URL + '/api/auth/updateProfile',
-        editedProfile, 
+        import.meta.env.VITE_BACKEND_URL + '/api/auth/updateProfile',
+        editedProfile,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-          }, 
+          },
         }
       );
       console.log("respone-edit", response)
-      if (response.statusText=="OK") {
-        const data =response;
-          setProfile(editedProfile);
-          // Update localStorage
-          localStorage.setItem('userData', JSON.stringify(editedProfile));
-          setIsEditing(false);  
-          alert('Profile updated successfully!');
+      if (response.statusText == "OK") {
+        const data = response;
+        setProfile(editedProfile);
+        // Update localStorage
+        localStorage.setItem('userData', JSON.stringify(editedProfile));
+        setIsEditing(false);
+        alert('Profile updated successfully!');
       } else {
         alert('Failed to update profile. Please try again.');
       }
@@ -479,7 +479,11 @@ console.log("-------------",token)
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Account Status</span>
-                    <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                    {profile.phoneVerified && profile.emailVerified ? (
+                      <Badge className="bg-green-100 text-green-800 text-xs">verified</Badge>
+                    ) : (
+                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">verification pending</Badge>
+                    )}
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Last Updated</span>

@@ -291,7 +291,8 @@
 
 // what w to change here idk the workings of app context also explain me the flow 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import api from '../config/api.js';
 // import { toast } from '@/components/ui/use-toast.jsx';
 
 
@@ -311,6 +312,7 @@ export const AppProvider = ({ children }) => {
   const [donations, setDonations] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Initialize user from localStorage only if exists
   useEffect(() => {
@@ -322,9 +324,9 @@ export const AppProvider = ({ children }) => {
           const decoded = jwtDecode(token); // { userId, role }
 
           setCurrentUser({
-        ...decoded,
-        ...(JSON.parse(localStorage.getItem("userData")) || {})
-      });
+            ...decoded,
+            ...(JSON.parse(localStorage.getItem("userData")) || {})
+          });
         } catch (error) {
           console.error('Error parsing user data:', error);
           localStorage.removeItem('authToken');
@@ -334,10 +336,30 @@ export const AppProvider = ({ children }) => {
       } else {
         setCurrentUser(null);
       }
+      setAuthLoading(false);
     };
-
     initializeUser();
   }, []);
+
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+
+      // backend should return latest user
+      const res = await api.get("/auth/me");
+
+      setCurrentUser({
+        ...res.data.user,
+        token,
+      });
+
+      // keep localStorage in sync
+      localStorage.setItem("userData", JSON.stringify(res.data.user));
+    } catch (error) {
+      console.error("Failed to refresh user", error);
+    }
+  };
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
@@ -409,6 +431,8 @@ export const AppProvider = ({ children }) => {
         toggleSidebar,
         currentUser,
         setCurrentUser,
+        refreshUser,
+        authLoading,
         members,
         setMembers,
         donations,
