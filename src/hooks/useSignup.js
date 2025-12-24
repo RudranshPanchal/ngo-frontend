@@ -72,9 +72,12 @@ export const useSignup = ({
         }
 
         await createPassword({
-          email: registeredEmail,
-          password: formData.password,
-        });
+  fullName: formData.name,
+  email: registeredEmail,
+  password: formData.password,
+  role: formData.role,
+});
+
 
         alert("Account created successfully");
         navigate("/login");
