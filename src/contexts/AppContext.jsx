@@ -347,7 +347,7 @@ export const AppProvider = ({ children }) => {
       if (!token) return;
 
       // backend should return latest user
-      const res = await api.get("/auth/me");
+      const res = await api.get("api/auth/me");
 
       setCurrentUser({
         ...res.data.user,

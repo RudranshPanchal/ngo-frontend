@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Lock, Mail, Phone, TrendingUp, Calendar, Users, Sparkles } from 'lucide-react';
+import { CheckCircle, CircleAlert, Lock, Mail, Phone, TrendingUp, Calendar, Users, Sparkles } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
 import VerificationModal from './VerificationModal';
+import api from '../config/api';
 
 const VerificationPendingDashboard = () => {
     // Mock verification state - in real app, this comes from API/context
@@ -30,8 +31,27 @@ const VerificationPendingDashboard = () => {
         }
     }, [emailVerified, phoneVerified]);
 
+    const openVerificationModal = async (type) => {
+        setVerifyType(type);
+        setModalOpen(true);
+
+        try {
+            if (type === "email") {
+                await api.post("/api/auth/send-email-verification-otp");
+            }
+
+            if (type === "phone") {
+                await api.post("/api/auth/send-phone-verification-otp", {
+                    contactNumber: currentUser.contactNumber,
+                });
+            }
+        } catch (err) {
+            console.error("OTP send failed", err);
+        }
+    };
+
     const handleVerifyEmail = async () => {
-        // call backend → send verification email
+        // call backend → send OTP
         await refreshUser();
     };
 
@@ -75,7 +95,7 @@ const VerificationPendingDashboard = () => {
                     {/* Progress Bar */}
                     <div className="bg-gray-200 rounded-full h-3 overflow-hidden">
                         <div
-                             className="h-full rounded-full transition-all duration-700 ease-out"
+                            className="h-full rounded-full transition-all duration-700 ease-out"
                             style={{
                                 width: `${progressPercentage}%`,
                                 // width: `50%`,
@@ -115,7 +135,7 @@ const VerificationPendingDashboard = () => {
                             {emailVerified ? (
                                 <CheckCircle className="w-6 h-6 text-green-600" />
                             ) : (
-                                <XCircle className="w-6 h-6 text-gray-300" />
+                                <CircleAlert className="w-6 h-6 text-gray-300" />
                             )}
                         </div>
 
@@ -132,8 +152,9 @@ const VerificationPendingDashboard = () => {
                         ) : (
                             <button
                                 onClick={() => {
-                                    setVerifyType("email");
-                                    setModalOpen(true);
+                                    // setVerifyType("email");
+                                    // setModalOpen(true);
+                                    openVerificationModal("email");
                                 }}
                                 className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
                             >
@@ -163,7 +184,7 @@ const VerificationPendingDashboard = () => {
                             {phoneVerified ? (
                                 <CheckCircle className="w-6 h-6 text-green-600" />
                             ) : (
-                                <XCircle className="w-6 h-6 text-gray-300" />
+                                <CircleAlert className="w-6 h-6 text-gray-300" />
                             )}
                         </div>
 
@@ -180,8 +201,9 @@ const VerificationPendingDashboard = () => {
                         ) : (
                             <button
                                 onClick={() => {
-                                    setVerifyType("phone");
-                                    setModalOpen(true);
+                                    // setVerifyType("phone");
+                                    // setModalOpen(true);
+                                    openVerificationModal("phone");
                                 }}
                                 className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
                             >
@@ -258,10 +280,19 @@ const VerificationPendingDashboard = () => {
                         ? currentUser.email
                         : currentUser.contactNumber
                 }
-                onClose={() => setModalOpen(false)}
+                onClose={() => {setModalOpen(false);   setVerifyType(null);}}
                 onVerify={async (otp) => {
-                    // call backend here
-                    await refreshUser();
+                    if (verifyType === "email") {
+                        await api.post("api/auth/verify-email-verification-otp", { otp });
+                        await refreshUser();
+                    }
+                    if (verifyType === "phone") {
+                        await api.post("api/auth/verify-phone-verification-otp", {
+                            // contactNumber: currentUser.contactNumber,
+                            otp,
+                        });
+                        await refreshUser();
+                    }
                 }}
             />
         </div>
