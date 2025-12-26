@@ -58,6 +58,7 @@ export const useSignup = ({
         await verifySignupOtp({
           email: registeredEmail,
           otp: formData.otp,
+          role: formData.role,
         });
 
         setStep("password");

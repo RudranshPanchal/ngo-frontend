@@ -155,7 +155,9 @@ setEmailError,
 
   const onSubmit = async (data) => {
     try {
-      await submitVolunteer(data);
+      
+      await submitVolunteer(data, emailVerified, phoneVerified);
+
     } catch (err) {
       console.error("Volunteer registration failed", err);
     }

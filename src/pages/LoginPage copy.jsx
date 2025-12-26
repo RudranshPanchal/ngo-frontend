@@ -127,7 +127,7 @@ const handleSubmit = async (e) => {
   setError(null);
 
   try { 
-    const loginResponse = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/auth/login", {
+    const loginResponse = await api.post("/api/auth/login", {
       email: formData.email,
       password: formData.password,
       role: formData.role,
@@ -142,7 +142,7 @@ const handleSubmit = async (e) => {
     }
     localStorage.setItem("authToken",token)
  
-    const userResponse = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/auth/me", {
+    const userResponse = await api.get("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
