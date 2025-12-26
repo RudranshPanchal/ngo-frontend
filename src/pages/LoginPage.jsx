@@ -28,8 +28,10 @@ const forgotSchema = yup.object().shape({
 const LoginPage = () => {
   const { setCurrentUser } = useAppContext();
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState(null);
+  // const [serverError, setServerError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [serverMessage, setServerMessage] = useState(null);
+  const [messageType, setMessageType] = useState("error"); // "error" | "success" | "info"
 
 
   // ✅ Integrate react-hook-form with yup validation
@@ -45,7 +47,7 @@ const LoginPage = () => {
   // ✅ Handle form submission
   const onSubmit = async (formData) => {
     // console.log('froo', formData)
-    setServerError(null);
+    setServerMessage(null);
     setLoading(true);
 
     try {
@@ -53,7 +55,7 @@ const LoginPage = () => {
       const { token } = loginResponse.data;
 
       if (!token) {
-        setServerError('Login failed: No token received.');
+        setServerMessage('Login failed: No token received.');
         return;
       }
       console.log("token-login", token)
@@ -81,20 +83,26 @@ const LoginPage = () => {
         const apiMessage = error.response.data?.error || error.response.data?.message;
 
         if (status === 400) {
-          setServerError(apiMessage || 'Role does not match. Please select the correct role.');
+          setMessageType("error");
+          setServerMessage(apiMessage || 'Role does not match. Please select the correct role.');
         } else if (status === 401) {
-          setServerError(apiMessage || 'Invalid email or password.');
+          setMessageType("error");
+          setServerMessage(apiMessage || 'Invalid email or password.');
         } else if (status === 403) {
           localStorage.setItem("tempEmail", formData.email);
-          setServerError('Password change required before proceeding.');
+          // setServerError('Password change required before proceeding.');
+          setMessageType("success");
+          setServerMessage("Password change required! Redirecting...");
           setTimeout(() => navigate('/change-password'), 2000);
         } else if (status === 404) {
-          setServerError(apiMessage || 'User not found. Please sign up first.');
+          setMessageType("error");
+          setServerMessage(apiMessage || 'User not found. Please sign up first.');
         } else {
-          setServerError(apiMessage || `Unexpected error (${status}). Please try again.`);
+          setMessageType("error");
+          setServerMessage(apiMessage || `Unexpected error (${status}). Please try again.`);
         }
       } else {
-        setServerError('Network error. Please check your internet connection.');
+        setServerMessage('Network error. Please check your internet connection.');
       }
     } finally {
       setLoading(false);
@@ -131,7 +139,18 @@ const LoginPage = () => {
             <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Access your account to continue</p>
           </CardHeader>
 
-          {serverError && <p className="ml-6 text-red-500">{serverError}</p>}
+          {/* {serverError && <p className="ml-6 text-red-500">{serverError}</p>} */}
+          {serverMessage && (
+            <div
+              className={`mx-6 mb-4 rounded-lg px-4 py-3 text-sm font-medium
+                ${messageType === "error" && "bg-red-50 text-red-700 border border-red-200"}
+                ${messageType === "success" && "bg-green-50 text-green-700 border border-green-200"}
+                ${messageType === "info" && "bg-blue-50 text-blue-700 border border-blue-200"}
+              `}>
+              {serverMessage}
+            </div>
+          )}
+
 
           <CardContent className="space-y-4 sm:space-y-6 relative px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
