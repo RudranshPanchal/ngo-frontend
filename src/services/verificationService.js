@@ -43,10 +43,17 @@ export const sendEmailOtpApi = ({ email, fullName, role }) => {
   });
 };
 
-export const verifyEmailOtpApi = ({ email, otp }) => {
+// export const verifyEmailOtpApi = ({ email, otp }) => {
+//   return api.post("/api/auth/signup/verify-otp", {
+//     email,
+//     otp,
+//   });
+// };
+export const verifyEmailOtpApi = ({ email, otp, role }) => { // <--- role add kiya
   return api.post("/api/auth/signup/verify-otp", {
     email,
     otp,
+    role: role || "volunteer", // <--- Ye bhejoge tabhi backend match karega
   });
 };
 
@@ -59,9 +66,10 @@ export const sendPhoneOtpApi = ({ contactNumber, fullName, role }) => {
   });
 };
 
-export const verifyPhoneOtpApi = ({ contactNumber, otp }) => {
+export const verifyPhoneOtpApi = ({ contactNumber, otp, role }) => { // <--- role add kiya
   return api.post("/api/auth/verify-phone-otp", {
     contactNumber,
     otp,
+    role: role || "volunteer", // <--- Ye missing tha
   });
 };

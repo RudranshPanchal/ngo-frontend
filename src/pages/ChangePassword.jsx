@@ -41,11 +41,11 @@ export default function ChangePassword() {
     }
 
     const email = localStorage.getItem("tempEmail");
-
+const role  = localStorage.getItem("tempRole") || "volunteer" 
     try {
       await axios.post(
         import.meta.env.VITE_BACKEND_URL + "/api/auth/changePassword",
-        { email, oldPassword, newPassword }
+        { email,role, oldPassword, newPassword }
       );
 
       setSuccess("Password updated successfully!");

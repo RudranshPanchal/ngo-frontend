@@ -225,24 +225,60 @@ export function useVolunteerRegister({ reset, getValues }) {
   const [emailTimer, setEmailTimer] = useState(0);
 
   /* ================= REGISTER ================= */
-  const submitVolunteer = async (data) => {
-    const formData = new FormData();
+  /* ================= REGISTER (Updated) ================= */
+const submitVolunteer = async (data, emailVerified, phoneVerified) => {
+  const formData = new FormData();
 
-    Object.keys(data).forEach((key) => {
-      if (key === "dob" && data[key]) {
-        formData.append("dob", new Date(data[key]).toISOString());
-      } else {
-        formData.append(key, data[key] || "");
-      }
-    });
+  // Sabhi text fields ko add karein
+  Object.keys(data).forEach((key) => {
+    if (key === "dob" && data[key]) {
+      formData.append("dob", new Date(data[key]).toISOString());
+    } else if (data[key] !== undefined && data[key] !== null) {
+      formData.append(key, data[key]);
+    }
+  });
 
-    if (uploadedFile) formData.append("uploadIdProof", uploadedFile);
+  // Verification flags ko Boolean se String bana kar bhejein (Backend readable)
+  formData.append("isEmailVerified", String(emailVerified));
+  formData.append("isPhoneVerified", String(phoneVerified));
 
-    await volunteerApi.register(formData);
+  // File check
+  if (uploadedFile) {
+    formData.append("uploadIdProof", uploadedFile);
+  }
+
+  try {
+    const response = await volunteerApi.register(formData);
     setShowSuccessModal(true);
     reset();
-  };
+    setUploadedFile(null);
+    return response;
+  } catch (err) {
+    // Isse aapko exact pata chalega backend kyu mana kar raha hai
+    console.error("Server Response Error:", err.response?.data);
+    throw err; // Isse page ka catch block trigger hoga
+  }
+};
 
+//   // useVolunteerRegister.js mein submitVolunteer function
+
+//  const submitVolunteer = async (data) => {
+//     const formData = new FormData();
+    
+//     // Baaki fields loop se append karein
+//     Object.keys(data).forEach((key) => {
+//         formData.append(key, data[key]);
+//     });
+
+//     // File check karein
+//     if (uploadedFile) {
+//         formData.append("uploadIdProof", uploadedFile);
+//     }
+
+//     // Yahan API call karein
+//     const response = await volunteerApi.register(formData);
+//     // ... rest of logic
+// };
   /* ================= PHONE OTP ================= */
   const sendPhoneOtp = async () => {
     if (phoneOtpLoading || phoneTimer > 0) return;
@@ -325,7 +361,12 @@ export function useVolunteerRegister({ reset, getValues }) {
 
     try {
       setVerifying(true);
-      await verifyEmailOtpApi({ email, otp: emailOtp });
+      // await verifyEmailOtpApi({ email, otp: emailOtp });
+      await verifyEmailOtpApi({
+        email,
+        otp: emailOtp,
+        role: "volunteer",
+      });
       setEmailVerified(true);
     } catch (err) {
       setEmailOtpError(err.response?.data?.message || "Invalid OTP");
@@ -349,12 +390,24 @@ export function useVolunteerRegister({ reset, getValues }) {
     }
   }, [emailTimer]);
 
+  // ... baaki saara logic upar ka same rahega ...
+
   return {
+    // Registration & File
     submitVolunteer,
     uploadedFile,
-    handleFileChange: (e) => setUploadedFile(e.target.files?.[0]),
+    handleFileChange: (e) => {
+      const file = e.target.files?.[0];
+      if (file && file.size <= 5 * 1024 * 1024) {
+        setUploadedFile(file);
+      } else {
+        alert("File size must be < 5MB");
+      }
+    },
+    showSuccessModal,
+    setShowSuccessModal,
 
-    // phone
+    // Phone Verification State
     sendPhoneOtp,
     verifyPhone,
     phoneOtp,
@@ -366,7 +419,7 @@ export function useVolunteerRegister({ reset, getValues }) {
     phoneTimer,
     phoneOtpLoading,
 
-    // email
+    // Email Verification State
     sendEmailOtp,
     verifyEmail,
     emailOtp,
@@ -377,10 +430,11 @@ export function useVolunteerRegister({ reset, getValues }) {
     emailOtpError,
     emailTimer,
     emailOtpLoading,
+
+    // General
     setPhoneError,
     setEmailError,
     verifying,
-    showSuccessModal,
-    setShowSuccessModal,
   };
+
 }
