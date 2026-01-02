@@ -12,6 +12,7 @@ import {
   Eye,
   CheckCircle2,
   XCircle,
+  Plus,
   UserCheck,
 } from "lucide-react";
 import DashboardHeader from "../components/DashboardHeader.jsx";
@@ -211,52 +212,70 @@ const VolunteerManagementPage = () => {
             </div>
 
             <Card className="border-0 shadow-sm">
-              <CardHeader className="border-b border-gray-100">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="h-5 w-5 text-blue-600" />
-                    Volunteers ({filteredVolunteers.length})
-                  </CardTitle>
+              <CardHeader className="px-6 py-5 border-b border-slate-100/80 bg-gradient-to-r from-white via-indigo-50/20 to-purple-50/30">
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    
+    {/* Title Section */}
+    <CardTitle className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+        <UserCheck className="h-4 w-4 text-white" />
+      </div>
+      <div>
+        <span className="text-lg font-semibold text-slate-800 tracking-tight">Volunteers</span>
+        <p className="text-xs text-slate-500 flex items-center gap-1.5 font-normal">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          {filteredVolunteers.length} active members
+        </p>
+      </div>
+    </CardTitle>
 
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { key: "all", label: "All" },
-                      { key: "pending", label: "Pending" },
-                      { key: "approved", label: "Approved" },
-                      { key: "rejected", label: "Rejected" },
-                    ].map((f) => {
-                      const isActive = statusFilter === f.key;
+    {/* Filters & Actions */}
+    <div className="flex flex-wrap items-center gap-2">
+      
+      {/* Filter Pills */}
+      <div className="flex items-center bg-slate-100/80 rounded-full p-1 gap-0.5">
+        {[
+          { key: "all", label: "All", color: null },
+          { key: "pending", label: "Pending", color: "bg-amber-400" },
+          { key: "approved", label: "Approved", color: "bg-emerald-500" },
+          { key: "rejected", label: "Rejected", color: "bg-rose-500" },
+        ].map((f) => {
+          const isActive = statusFilter === f.key;
 
-                      return (
-                        <Button
-                          key={f.key}
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setStatusFilter(f.key)}
-                          className={`text-xs sm:text-sm transition-all
-    ${isActive
-                              ? "bg-gray-200 text-gray-900 border-gray-400 hover:bg-gray-300"
-                              : "bg-white text-black hover:bg-gray-100"
-                            }
-  `}
-                        >
-                          {f.label}
-                        </Button>
+          return (
+            <Button
+              key={f.key}
+              size="sm"
+              variant="ghost"
+              onClick={() => setStatusFilter(f.key)}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer border-0
+                ${isActive
+                  ? "bg-gradient-to-r from-slate-900 to-indigo-900 text-white shadow-md"
+                  : "text-slate-600 hover:bg-white hover:shadow-sm"
+                }`}
+            >
+              <span className="flex items-center gap-1.5">
+                {f.color && <span className={`w-1.5 h-1.5 rounded-full ${f.color}`} />}
+                {f.label}
+              </span>
+            </Button>
+          );
+        })}
+      </div>
 
-                      );
-                    })}
+      {/* Add Volunteer Button */}
+      <Button
+        onClick={() => setAddVolunteerOpen(true)}
+        size="sm"
+        className="bg-gradient-to-r from-indigo-500 via-purple-500 to-purple-600 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer border-0"
+      >
+        <Plus className="w-3 h-3 mr-2" />
+        Add Volunteer
+      </Button>
+    </div>
 
-                    <Button
-                      onClick={() => setAddVolunteerOpen(true)}
-                      size="sm"
-                      className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-xs sm:text-sm"
-                    >
-                      Add Volunteer
-                    </Button>
-                  </div>
-
-                </div>
-              </CardHeader>
+  </div>
+</CardHeader>
 
               <CardContent className="p-6">
                 {/* Search */}
@@ -356,7 +375,7 @@ const VolunteerManagementPage = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-gray-700 hover:text-gray-900 p-2"
+                                    className="text-gray-700 hover:text-gray-900 p-2 cursor-pointer hover:bg-gray-100 rounded-md transition-all duration-200"
                                     onClick={() => handleView(vol)}
                                   >
                                     <Eye className="h-4 w-4" />
@@ -456,13 +475,16 @@ const VolunteerManagementPage = () => {
             {/* Footer */}
             <div className="mt-5 flex justify-end gap-2">
               <Button
+              className="border-0bg-gray-200 hover:bg-gray-300 text-gray-800 cursor-pointer"
                 variant="outline"
                 onClick={() => setPasswordModalOpen(false)}
               >
                 Cancel
               </Button>
 
-              <Button onClick={confirmApprove} disabled={statusLoadingId !== null}>
+              <Button 
+              className="bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
+              onClick={confirmApprove} disabled={statusLoadingId !== null}>
                 {statusLoadingId ? "Approving..." : "Approve & Send Email"}
               </Button>
             </div>

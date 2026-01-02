@@ -186,6 +186,10 @@
 //     verifying,
 //   };
 // }
+
+
+
+
 import { useEffect, useState } from "react";
 import {
   sendEmailOtpApi,
@@ -226,59 +230,75 @@ export function useVolunteerRegister({ reset, getValues }) {
 
   /* ================= REGISTER ================= */
   /* ================= REGISTER (Updated) ================= */
-const submitVolunteer = async (data, emailVerified, phoneVerified) => {
-  const formData = new FormData();
+  const submitVolunteer = async (data, emailVerified, phoneVerified) => {
+    const formData = new FormData();
 
-  // Sabhi text fields ko add karein
-  Object.keys(data).forEach((key) => {
-    if (key === "dob" && data[key]) {
-      formData.append("dob", new Date(data[key]).toISOString());
-    } else if (data[key] !== undefined && data[key] !== null) {
-      formData.append(key, data[key]);
+    // Sabhi text fields ko add karein
+    Object.keys(data).forEach((key) => {
+      // ❌ file field ko skip karo
+      if (key === "idProof") return;
+
+      // ✅ DOB special handling
+      if (key === "dob" && data[key]) {
+        formData.append("dob", new Date(data[key]).toISOString());
+        return;
+      }
+
+      // ❌ undefined / null skip
+      if (data[key] === undefined || data[key] === null) return;
+
+      // ✅ boolean ko string me convert karo
+      if (typeof data[key] === "boolean") {
+        formData.append(key, String(data[key]));
+        return;
+      }
+
+      // ✅ normal text fields
+      formData.append(key, data[key].toString());
+    });
+
+
+    // Verification flags ko Boolean se String bana kar bhejein (Backend readable)
+    formData.append("isEmailVerified", String(emailVerified));
+    formData.append("isPhoneVerified", String(phoneVerified));
+
+    // File check
+    if (uploadedFile) {
+      formData.append("uploadIdProof", uploadedFile);
     }
-  });
 
-  // Verification flags ko Boolean se String bana kar bhejein (Backend readable)
-  formData.append("isEmailVerified", String(emailVerified));
-  formData.append("isPhoneVerified", String(phoneVerified));
+    try {
+      const response = await volunteerApi.register(formData);
+      setShowSuccessModal(true);
+      reset();
+      setUploadedFile(null);
+      return response;
+    } catch (err) {
+      // Isse aapko exact pata chalega backend kyu mana kar raha hai
+      console.error("Server Response Error:", err.response?.data);
+      throw err; // Isse page ka catch block trigger hoga
+    }
+  };
 
-  // File check
-  if (uploadedFile) {
-    formData.append("uploadIdProof", uploadedFile);
-  }
+  //   // useVolunteerRegister.js mein submitVolunteer function
 
-  try {
-    const response = await volunteerApi.register(formData);
-    setShowSuccessModal(true);
-    reset();
-    setUploadedFile(null);
-    return response;
-  } catch (err) {
-    // Isse aapko exact pata chalega backend kyu mana kar raha hai
-    console.error("Server Response Error:", err.response?.data);
-    throw err; // Isse page ka catch block trigger hoga
-  }
-};
+  //  const submitVolunteer = async (data) => {
+  //     const formData = new FormData();
 
-//   // useVolunteerRegister.js mein submitVolunteer function
+  //     // Baaki fields loop se append karein
+  //     Object.keys(data).forEach((key) => {
+  //         formData.append(key, data[key]);
+  //     });
 
-//  const submitVolunteer = async (data) => {
-//     const formData = new FormData();
-    
-//     // Baaki fields loop se append karein
-//     Object.keys(data).forEach((key) => {
-//         formData.append(key, data[key]);
-//     });
+  //     // File check karein
+  //     if (uploadedFile) {
+  //         formData.append("uploadIdProof", uploadedFile);
+  //     }
 
-//     // File check karein
-//     if (uploadedFile) {
-//         formData.append("uploadIdProof", uploadedFile);
-//     }
-
-//     // Yahan API call karein
-//     const response = await volunteerApi.register(formData);
-//     // ... rest of logic
-// };
+  //     // Yahan API call karein
+  //     const response = await volunteerApi.register(formData);
+  //     // ... rest of logic
+  // };
   /* ================= PHONE OTP ================= */
   const sendPhoneOtp = async () => {
     if (phoneOtpLoading || phoneTimer > 0) return;

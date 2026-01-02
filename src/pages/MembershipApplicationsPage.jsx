@@ -408,175 +408,174 @@ const MembershipApplicationsPage = () => {
 };
 
   return (
-    <><h1>Application</h1></>
-    // <div className="flex h-screen bg-gray-50">
-    //   <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-    //   <div className="flex-1 flex flex-col overflow-hidden">
-    //     <DashboardHeader />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <DashboardHeader />
 
-    //     <div className="flex-1 overflow-auto p-6">
-    //       <div className="max-w-7xl mx-auto">
-    //         {/* Header */}
-    //         <div className="mb-6">
-    //           <h1 className="text-2xl font-bold text-gray-900">
-    //             Membership Applications
-    //           </h1>
-    //           <p className="text-gray-600">
-    //             Review and manage all membership requests
-    //           </p>
-    //         </div>
+        <div className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Membership Applications
+              </h1>
+              <p className="text-gray-600">
+                Review and manage all membership requests
+              </p>
+            </div>
 
-    //         <Card className="border-0 shadow-sm">
-    //           <CardHeader className="border-b border-gray-100">
-    //             <div className="flex flex-col sm:flex-row justify-between gap-4">
-    //               <CardTitle className="flex items-center gap-2">
-    //                 <Users className="h-5 w-5 text-purple-600" />
-    //                 Applications ({filteredApplications.length})
-    //               </CardTitle>
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="border-b border-gray-100">
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    Applications ({filteredApplications.length})
+                  </CardTitle>
 
-    //               <div className="flex flex-wrap gap-2">
-    //                 {["all", "pending", "approved", "rejected"].map((s) => (
-    //                   <Button
-    //                     key={s}
-    //                     size="sm"
-    //                     variant="outline"
-    //                     onClick={() => setStatusFilter(s)}
-    //                     className={`text-sm ${
-    //                       statusFilter === s
-    //                         ? "bg-gray-200 border-gray-400"
-    //                         : ""
-    //                     }`}
-    //                   >
-    //                     {s.charAt(0).toUpperCase() + s.slice(1)}
-    //                   </Button>
-    //                 ))}
+                  <div className="flex flex-wrap gap-2">
+                    {["all", "pending", "approved", "rejected"].map((s) => (
+                      <Button
+                        key={s}
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setStatusFilter(s)}
+                        className={`text-sm ${
+                          statusFilter === s
+                            ? "bg-gray-200 border-gray-400"
+                            : ""
+                        }`}
+                      >
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </Button>
+                    ))}
 
-    //                 <Button
-    //                   size="sm"
-    //                   className="bg-blue-600 hover:bg-blue-700 text-white"
-    //                 >
-    //                   Add Member
-    //                 </Button>
-    //               </div>
-    //             </div>
-    //           </CardHeader>
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Add Member
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
 
-    //           <CardContent className="p-6">
-    //             {/* Search */}
-    //             <div className="mb-4 relative">
-    //               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-    //               <Input
-    //                 className="pl-10"
-    //                 placeholder="Search by name or email"
-    //                 value={searchTerm}
-    //                 onChange={(e) => setSearchTerm(e.target.value)}
-    //               />
-    //             </div>
+              <CardContent className="p-6">
+                {/* Search */}
+                <div className="mb-4 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    className="pl-10"
+                    placeholder="Search by name or email"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
 
-    //             {loading ? (
-    //               <div className="py-10 text-center text-gray-500">
-    //                 Loading applications...
-    //               </div>
-    //             ) : (
-    //               <div className="overflow-x-auto">
-    //                 <table className="w-full text-sm">
-    //                   <thead>
-    //                     <tr className="border-b bg-gray-100/60">
-    //                       {["Name", "Email", "Status", "Actions"].map((h) => (
-    //                         <th key={h} className="text-left py-2 px-4 font-semibold"> {h} </th>                                                                                                                                      
-    //                       ))}
-    //                     </tr>
-    //                   </thead>
+                {loading ? (
+                  <div className="py-10 text-center text-gray-500">
+                    Loading applications...
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b bg-gray-100/60">
+                          {["Name", "Email", "Status", "Actions"].map((h) => (
+                            <th key={h} className="text-left py-2 px-4 font-semibold"> {h} </th>                                                                                                                                      
+                          ))}
+                        </tr>
+                      </thead>
 
-    //                   <tbody>
-    //                     {filteredApplications.map((app) => (
-    //                       <tr
-    //                         key={app._id}
-    //                         className="border-b hover:bg-gray-50">
+                      <tbody>
+                        {filteredApplications.map((app) => (
+                          <tr
+                            key={app._id}
+                            className="border-b hover:bg-gray-50">
                           
-    //                         <td className="py-3 px-4 font-medium">
-    //                           {app.fullName}
-    //                         </td>
-    //                         <td className="py-3 px-4 text-gray-600">
-    //                           {app.email}
-    //                         </td>
-    //                         <td className="py-3 px-4">
-    //                           <span
-    //                               className={`inline-flex items-center px-2 py-[3px] rounded-full 
-    //                               text-[12px] font-medium
-    //                               ${getStatusClasses(app.status)}`}>
+                            <td className="py-3 px-4 font-medium">
+                              {app.fullName}
+                            </td>
+                            <td className="py-3 px-4 text-gray-600">
+                              {app.email}
+                            </td>
+                            <td className="py-3 px-4">
+                              <span
+                                  className={`inline-flex items-center px-2 py-[3px] rounded-full 
+                                  text-[12px] font-medium
+                                  ${getStatusClasses(app.status)}`}>
                               
-    //                             {app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase()}
-    //                           </span>
+                                {app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase()}
+                              </span>
 
-    //                         </td>
-    //                         <td className="py-3 px-4">
-    //                         <div className="flex items-center gap-6 text-sm">
+                            </td>
+                            <td className="py-3 px-4">
+                            <div className="flex items-center gap-6 text-sm">
 
-    //                                             {/* View */}
-    //                                             <button
-    //                                               onClick={() => navigate(`/member-detail/${app._id}`)}
-    //                                               className="flex items-center gap-1 text-gray-600 hover:text-gray-900">
+                                                {/* View */}
+                                                <button
+                                                  onClick={() => navigate(`/member-detail/${app._id}`)}
+                                                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900">
                                                 
-    //                                               <Eye className="h-4 w-4" />
-    //                                             </button>
+                                                  <Eye className="h-4 w-4" />
+                                                </button>
 
-    //                                             {/* Approve */}
-    //                                             <button
-    //                                               disabled={app.status !== "pending"}
-    //                                               onClick={() => updateStatus(app._id, "approved")}
-    //                                               className={`flex items-center gap-1 font-medium
-    //                                                 ${
-    //                                                   app.status === "pending"
-    //                                                     ? "text-green-700 hover:text-green-800 cursor-pointer"
-    //                                                     : "text-green-400"
-    //                                                 }`}>
+                                                {/* Approve */}
+                                                <button
+                                                  disabled={app.status !== "pending"}
+                                                  onClick={() => updateStatus(app._id, "approved")}
+                                                  className={`flex items-center gap-1 font-medium
+                                                    ${
+                                                      app.status === "pending"
+                                                        ? "text-green-700 hover:text-green-800 cursor-pointer"
+                                                        : "text-green-400"
+                                                    }`}>
                                                 
-    //                                               <CheckCircle2 className="h-4 w-4" />
-    //                                              Approve
-    //                                             </button>
+                                                  <CheckCircle2 className="h-4 w-4" />
+                                                 Approve
+                                                </button>
 
-    //                                             {/* Reject */}
-    //                                             <button
-    //                                               disabled={app.status !== "pending"}
-    //                                               onClick={() => updateStatus(app._id, "rejected")}
-    //                                               className={`flex items-center gap-1 font-medium
-    //                                                 ${
-    //                                                   app.status === "pending"
-    //                                                     ? "text-red-600 hover:text-red-800 cursor-pointer"
-    //                                                     : "text-red-400"}`}>
+                                                {/* Reject */}
+                                                <button
+                                                  disabled={app.status !== "pending"}
+                                                  onClick={() => updateStatus(app._id, "rejected")}
+                                                  className={`flex items-center gap-1 font-medium
+                                                    ${
+                                                      app.status === "pending"
+                                                        ? "text-red-600 hover:text-red-800 cursor-pointer"
+                                                        : "text-red-400"}`}>
                                                                                                    
-    //                                           <XCircle className="h-4 w-4" />
-    //                                         Reject
-    //                                    </button>
+                                              <XCircle className="h-4 w-4" />
+                                            Reject
+                                       </button>
 
-    //                              </div>
-    //                          </td>
+                                 </div>
+                             </td>
 
-    //                       </tr>
-    //                     ))}
+                          </tr>
+                        ))}
 
-    //                     {filteredApplications.length === 0 && (
-    //                       <tr>
-    //                         <td
-    //                           colSpan="4"
-    //                           className="py-6 text-center text-gray-500"
-    //                         >
-    //                           No applications found
-    //                         </td>
-    //                       </tr>
-    //                     )}
-    //                   </tbody>
-    //                 </table>
-    //               </div>
-    //             )}
-    //           </CardContent>             
-    //         </Card>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+                        {filteredApplications.length === 0 && (
+                          <tr>
+                            <td
+                              colSpan="4"
+                              className="py-6 text-center text-gray-500"
+                            >
+                              No applications found
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>             
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

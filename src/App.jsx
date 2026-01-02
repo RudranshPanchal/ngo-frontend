@@ -6,6 +6,7 @@ import './App.css'
 import Home from './pages/Home'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import EventManagement from './pages/EventManagement.jsx'
 import MembershipApplicationPage from './pages/MembershipApplicationPage'
 import DonorRegistrationPage from './pages/DonorRegistrationPage'
 import DashboardPage from './pages/DashboardPage'
@@ -63,6 +64,7 @@ const AppContent = () => {
           <Route path="/FundRaising" element={<FundRaising />} />
 
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/event-management" element={<EventManagement />} />
           <Route path="/membership" element={<MembershipApplicationPage />} />
           <Route path="/donor-registration" element={<DonorRegistrationPage />} />
           <Route path="/contact" element={<ContactPage />} />

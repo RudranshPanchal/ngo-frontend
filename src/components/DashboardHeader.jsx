@@ -28,7 +28,7 @@ const DashboardHeader = () => {
   
   const notifications = [
     { id: 1, message: 'New volunteer registered', time: '2 min ago', unread: true },
-    { id: 2, message: 'Monthly report generated', time: '1 hour ago', unread: true },
+    { id: 2, message: 'Audit report generated', time: '1 hour ago', unread: true },
     { id: 3, message: 'Certificate issued', time: '3 hours ago', unread: false }
   ];
   
@@ -62,7 +62,7 @@ const DashboardHeader = () => {
           </button>
           <div>
             <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Welcome back, {currentUser?.name}!</p>
+            <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Welcome back, {currentUser?.fullName}!</p>
           </div>
         </div>
         
@@ -118,7 +118,7 @@ const DashboardHeader = () => {
               className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
             >
               <span className="text-white font-medium text-xs sm:text-sm">
-                {currentUser?.name?.charAt(0)?.toUpperCase()}
+                {currentUser?.fullName?.charAt(0)?.toUpperCase()}
               </span>
             </button>
             

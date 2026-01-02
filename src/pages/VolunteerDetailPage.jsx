@@ -215,7 +215,7 @@ const VolunteerDetailPage = () => {
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
                       <span>
-                        {volunteer.address && volunteer.state
+                        {volunteer.address || volunteer.state
                           ? `${volunteer.address}, ${volunteer.state}`
                           : volunteer.location || 'No location'
                         }
@@ -350,7 +350,7 @@ const VolunteerDetailPage = () => {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Address</label>
                   <p className="text-gray-900">
-                    {volunteer.address && volunteer.state
+                    {volunteer.address || volunteer.state
                       ? `${volunteer.address}, ${volunteer.state}`
                       : volunteer.location || 'No address'
                     }

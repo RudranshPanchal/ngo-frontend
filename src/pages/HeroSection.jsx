@@ -108,7 +108,7 @@ const HeroSection = () => {
                 <Button
                   onClick={() => handeClick()}
                   size="lg"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-lg"
+                  className="w-full bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-lg"
                 >
                   Volunteer With Us
                 </Button>

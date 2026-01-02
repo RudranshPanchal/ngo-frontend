@@ -41,46 +41,89 @@ const validationSchema = yup.object().shape({
     .max(50)
     .matches(/^[a-zA-Z\s]+$/, "Only letters allowed"),
 
-  gender: yup.string().required(),
+  gender: yup.string().required("Gender is required"),
 
   dob: yup
     .date()
-    .required()
-    .max(new Date())
-    .test("age", "Minimum age 16", (value) => {
-      const d = new Date();
-      d.setFullYear(d.getFullYear() - 16);
-      return value && value <= d;
+    .typeError("Please enter a valid date")
+    .required("Date of birth is required")
+    .max(new Date(), "DOB cannot be in the future")
+    .test("age", "Minimum age should be 16", (value) => {
+      if (!value) return false;
+      const today = new Date();
+      const minDate = new Date(
+        today.getFullYear() - 16,
+        today.getMonth(),
+        today.getDate()
+      );
+      return value <= minDate;
     }),
 
   contactNumber: yup
     .string()
-  .required("Contact number is required")
-  .length(10, "Enter a valid 10-digit mobile number"),
-email: yup
-  .string()
-  .required("Email is required")
-  .email("Please enter a valid email"),
-    // email: yup.string().required().email(),
+    .required("Contact number is required")
+    .length(10, "Enter a valid 10-digit mobile number"),
 
-  address: yup.string().min(10).max(200),
-  skills: yup.string().max(100),
-  profession: yup.string().max(50),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Please enter a valid email"),
 
-  areaOfVolunteering: yup.string().required(),
-  availability: yup.string().required(),
+  address: yup
+    .string()
+    .required("Address is required")
+    .min(10, "Address must be at least 10 characters")
+    .max(200, "Address cannot exceed 200 characters"),
+
+  skills: yup
+    .string()
+    .required("Please mention your interested skills")
+    .min(3, "Please enter at least one skill")
+    .max(100, "Skills cannot exceed 100 characters"),
+
+  profession: yup
+    .string()
+    .required("Profession is required")
+    .min(2, "Profession must be at least 2 characters")
+    .max(50, "Profession cannot exceed 50 characters"),
+
+  areaOfVolunteering: yup.string().required("Preferred area is required"),
+
+  availability: yup.string().required("Availability is required"),
+
+  idProof: yup
+    .mixed()
+    .required("ID proof is required")
+    .test(
+      "fileType",
+      "Only PDF, JPG, JPEG, PNG files are allowed",
+      (file) => {
+        if (!file) return false;
+        return ["application/pdf", "image/jpeg", "image/png"].includes(file.type);
+      }
+    ),
 
   emergencyContactNumber: yup
     .string()
-    .required()
-    .matches(/^[0-9]{10}$/)
-    .test("different", "Must be different", function (v) {
-      return v !== this.parent.contactNumber;
-    }),
+    .required("Emergency contact number is required")
+    .matches(/^[0-9]{10}$/, "Enter a valid 10-digit emergency number")
+    .test(
+      "different",
+      "Emergency number must be different from contact number",
+      function (value) {
+        return value !== this.parent.contactNumber;
+      }
+    ),
 
-  whyJoinUs: yup.string().min(20).max(500),
+  whyJoinUs: yup
+    .string()
+    .required("Please tell us why you want to join")
+    .min(20, "Minimum 20 characters required")
+    .max(500, "Maximum 500 characters allowed"),
 
-  termsAccepted: yup.boolean().oneOf([true]),
+  termsAccepted: yup
+    .boolean()
+    .oneOf([true], "Please accept the terms and conditions"),
 });
 
 /* ===============================
@@ -105,7 +148,7 @@ const VolunteerRegistrationPage = () => {
     defaultValues: {
       fullName: "",
       gender: "",
-      dob: "",
+      dob: null,
       contactNumber: "",
       email: "",
       address: "",
@@ -120,42 +163,42 @@ const VolunteerRegistrationPage = () => {
   });
 
   const {
-  submitVolunteer,
-  uploadedFile,
-  handleFileChange,
-  showSuccessModal,
-  setShowSuccessModal,
+    submitVolunteer,
+    uploadedFile,
+    handleFileChange,
+    showSuccessModal,
+    setShowSuccessModal,
 
-  // PHONE OTP
-  phoneOtp,
-  setPhoneOtp,
-  phoneOtpSent,
-  phoneVerified,
-  sendPhoneOtp,
-  phoneOtpLoading,   
-setEmailError,
-  // EMAIL OTP
-  emailOtp,
-  setEmailOtp,
-  emailOtpSent,
-  emailVerified,
-  sendEmailOtp,
-  emailOtpLoading,
- phoneTimer,   
- phoneError,
- emailTimer,
-  emailError,
-  phoneOtpError,
-  setPhoneError,
-  verifyEmail,
-  verifyPhone,
-  emailOtpError,
-  verifying,
-} = useVolunteerRegister({ reset, getValues });
+    // PHONE OTP
+    phoneOtp,
+    setPhoneOtp,
+    phoneOtpSent,
+    phoneVerified,
+    sendPhoneOtp,
+    phoneOtpLoading,
+    setEmailError,
+    // EMAIL OTP
+    emailOtp,
+    setEmailOtp,
+    emailOtpSent,
+    emailVerified,
+    sendEmailOtp,
+    emailOtpLoading,
+    phoneTimer,
+    phoneError,
+    emailTimer,
+    emailError,
+    phoneOtpError,
+    setPhoneError,
+    verifyEmail,
+    verifyPhone,
+    emailOtpError,
+    verifying,
+  } = useVolunteerRegister({ reset, getValues });
 
   const onSubmit = async (data) => {
     try {
-      
+
       await submitVolunteer(data, emailVerified, phoneVerified);
 
     } catch (err) {
@@ -164,36 +207,36 @@ setEmailError,
   };
 
   const watchedDob = watch("dob");
-const handleSendPhoneOtp = async () => {
-  const phone = getValues("contactNumber");
+  const handleSendPhoneOtp = async () => {
+    const phone = getValues("contactNumber");
 
-  //  invalid
-  if (!phone || phone.length !== 10) {
-    trigger("contactNumber");
-    return;
-  }
+    //  invalid
+    if (!phone || phone.length !== 10) {
+      trigger("contactNumber");
+      return;
+    }
 
-  // valid → errors hatao
-  clearErrors("contactNumber");
-  setPhoneError("");
+    // valid → errors hatao
+    clearErrors("contactNumber");
+    setPhoneError("");
 
-  //  IMPORTANT: number pass karo
-  await sendPhoneOtp(phone);
-};
+    //  IMPORTANT: number pass karo
+    await sendPhoneOtp(phone);
+  };
 
-const handleSendEmailOtp = async () => {
-  const email = getValues("email");
+  const handleSendEmailOtp = async () => {
+    const email = getValues("email");
 
-  if (!email) {
-    trigger("email");
-    return;
-  }
+    if (!email) {
+      trigger("email");
+      return;
+    }
 
-  clearErrors("email");
-  setEmailError("");
+    clearErrors("email");
+    setEmailError("");
 
-  await sendEmailOtp(email);
-};
+    await sendEmailOtp(email);
+  };
 
   /* ⬇️ JSX RETURN YAHAN SE START HOTA HAI */
 
@@ -203,7 +246,7 @@ const handleSendEmailOtp = async () => {
         <div className="mb-6">
           <button className="flex items-center gap-2 text-gray-600 hover:text-purple-600">
             <ArrowLeft className="h-4 w-4" />
-            <span onClick={() => navigate('/')} className="text-sm font-medium">Back to Home</span>
+            <span onClick={() => navigate('/')} className="text-sm font-medium cursor-pointer">Back to Home</span>
           </button>
         </div>
 
@@ -328,24 +371,42 @@ const handleSendEmailOtp = async () => {
 
                   <div className="space-y-2">
                     <Label>Date of Birth *</Label>
+
                     <Controller
                       name="dob"
                       control={control}
                       render={({ field }) => (
                         <ReactDatePicker
-                          selected={field.value ? new Date(field.value) : null}
-                          onChange={(date) => field.onChange(date)}
+                          selected={field.value}
+                          onChange={(date) => {
+                            field.onChange(date);
+                            trigger("dob");
+                          }}
+                          onBlur={field.onBlur}
                           dateFormat="dd/MM/yyyy"
-                          placeholderText="dd/mm/yyyy"
-                          className="w-full border rounded p-2"
+                          placeholderText="DD/MM/YYYY"
+                          className={`w-full border-1 rounded p-2 ${errors.dob ? "border-red-500" : "border-black-300"
+                            }`}
                           showYearDropdown
                           showMonthDropdown
                           scrollableYearDropdown
                           yearDropdownItemNumber={100}
+                          maxDate={new Date()}
+                          showPopperArrow={false}
+
+                          /* 🔥 THIS disables typing WITHOUT killing picker */
+                          onChangeRaw={(e) => e.preventDefault()}
                         />
                       )}
                     />
+
+                    {errors.dob && (
+                      <p className="text-red-500 text-xs">
+                        {errors.dob.message}
+                      </p>
+                    )}
                   </div>
+
 
 
 
@@ -370,6 +431,7 @@ const handleSendEmailOtp = async () => {
                     <Label htmlFor="profession">Profession</Label>
                     <Input
                       id="profession"
+                      placeholder="e.g., Student, Engineer, Teacher"
                       {...register("profession")}
                       className={errors.profession ? "border-red-500" : ""}
                     />
@@ -442,107 +504,107 @@ const handleSendEmailOtp = async () => {
                       )}
                   </div> */}
 
-{/* Contact Number */}
-<div className="space-y-2">
-  <Label htmlFor="contactNumber">Contact Number *</Label>
-  <Controller
-    name="contactNumber"
-    control={control}
-    render={({ field }) => (
-      <Input
-        id="contactNumber"
-        type="tel"
-        {...field}
-        placeholder="Enter 10-digit number"
-        disabled={phoneVerified}   
-        onChange={(e) => {
-          const filtered = e.target.value.replace(/\D/g, "").slice(0, 10);
-          field.onChange(filtered);
-           if (filtered.length === 10) {
-  clearErrors("contactNumber");
-  trigger("contactNumber");
-  setPhoneError("");   // 👈 OTP error clear
-}
-        }}
-        className={errors.contactNumber || phoneError ? "border-red-500" : ""}
-          
-      />
-    )}
-  />
-  {(errors.contactNumber || phoneError) && (
-      <p className="text-xs text-red-600">
-        {errors.contactNumber?.message || phoneError}
-      </p>
-    )}
-</div>
+                  {/* Contact Number */}
+                  <div className="space-y-2">
+                    <Label htmlFor="contactNumber">Contact Number *</Label>
+                    <Controller
+                      name="contactNumber"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          id="contactNumber"
+                          type="tel"
+                          {...field}
+                          placeholder="Enter 10-digit number"
+                          disabled={phoneVerified}
+                          onChange={(e) => {
+                            const filtered = e.target.value.replace(/\D/g, "").slice(0, 10);
+                            field.onChange(filtered);
+                            if (filtered.length === 10) {
+                              clearErrors("contactNumber");
+                              trigger("contactNumber");
+                              setPhoneError("");   // 👈 OTP error clear
+                            }
+                          }}
+                          className={errors.contactNumber || phoneError ? "border-red-500" : ""}
 
-{/* PHONE VERIFICATION */}
-<div className="space-y-2">
-  {/* LABEL — sirf text */}
-  <p className="text-sm text-gray-600">
-    Phone Verification (optional)
-  </p>
+                        />
+                      )}
+                    />
+                    {(errors.contactNumber || phoneError) && (
+                      <p className="text-xs text-red-600">
+                        {errors.contactNumber?.message || phoneError}
+                      </p>
+                    )}
+                  </div>
 
-  {/* BUTTON — hamesha next line me */}
-  {!phoneOtpSent && (
-    <Button
-      type="button"
-      onClick={handleSendPhoneOtp}
-      disabled={phoneOtpLoading || phoneTimer > 0}
-      className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-fit"
-    >
-      {phoneOtpLoading ? "Sending..." : "Send OTP(for pone verification)"}
-    </Button>
-  )}
+                  {/* PHONE VERIFICATION */}
+                  <div className="space-y-2">
+                    {/* LABEL — sirf text */}
+                    <p className="text-sm text-gray-600">
+                      Phone Verification (optional)
+                    </p>
 
-  {/* {phoneError && <p className="text-xs text-red-600">{phoneError}</p>} */}
+                    {/* BUTTON — hamesha next line me */}
+                    {!phoneOtpSent && (
+                      <Button
+                        type="button"
+                        onClick={handleSendPhoneOtp}
+                        disabled={phoneOtpLoading || phoneTimer > 0}
+                        className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white w-full sm:w-fit"
+                      >
+                        {phoneOtpLoading ? "Sending..." : "Send OTP(for phone verification)"}
+                      </Button>
+                    )}
 
-  {phoneOtpSent && !phoneVerified && (
-    <>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Input
-          placeholder="Enter 6 digit OTP"
-           maxLength={6}       
-          value={phoneOtp}
-          onChange={(e) => setPhoneOtp(e.target.value)}
-        />
-        <Button
-          type="button"
-          onClick={verifyPhone}
-          disabled={verifying}
-          variant="outline"
-          className="bg-purple-600 text-white  hover:bg-purple-700"
-        >
-          Verify
-        </Button>
-      </div>
+                    {/* {phoneError && <p className="text-xs text-red-600">{phoneError}</p>} */}
 
-      {phoneOtpError && (
-        <p className="text-xs text-red-600">{phoneOtpError}</p>
-      )}
+                    {phoneOtpSent && !phoneVerified && (
+                      <>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Input
+                            placeholder="Enter 6 digit OTP"
+                            maxLength={6}
+                            value={phoneOtp}
+                            onChange={(e) => setPhoneOtp(e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            onClick={verifyPhone}
+                            disabled={verifying}
+                            variant="outline"
+                            className="bg-purple-600 text-white  hover:bg-purple-700"
+                          >
+                            Verify
+                          </Button>
+                        </div>
 
-      {phoneTimer > 0 ? (
-        <p className="text-xs text-gray-500">
-          Resend OTP in {phoneTimer}s
-        </p>
-      ) : (
-        <button
-          type="button"
-          onClick={sendPhoneOtp}
-          className="text-xs text-purple-600 hover:underline"
-        >
-          Resend OTP
-        </button>
-      )}
-    </>
-  )}
+                        {phoneOtpError && (
+                          <p className="text-xs text-red-600">{phoneOtpError}</p>
+                        )}
 
-  {phoneVerified && (
-    <p className="text-sm text-green-600 font-medium">
-      ✔ Phone number verified
-    </p>
-  )}
-</div>
+                        {phoneTimer > 0 ? (
+                          <p className="text-xs text-gray-500">
+                            Resend OTP in {phoneTimer}s
+                          </p>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={sendPhoneOtp}
+                            className="text-xs text-purple-600 hover:underline"
+                          >
+                            Resend OTP
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {phoneVerified && (
+                      <p className="text-sm text-green-600 font-medium">
+                        ✔ Phone number verified
+                      </p>
+                    )}
+                  </div>
 
                   {/* Email
                   <div className="space-y-2">
@@ -594,87 +656,88 @@ const handleSendEmailOtp = async () => {
                       <p className="text-green-600 text-sm font-medium">✔ Email Verified</p>
                     )}
                   </div> */}
-{/* Email */}
-<div className="space-y-2">
-  <Label htmlFor="email">Email *</Label>
-  <Input
-    id="email"
-    type="email"
-    disabled={emailVerified}
-    {...register("email")}
-    className={errors.email || emailError ? "border-red-500" : ""}
-  />
-{(errors.email || emailError) && (
-      <p className="text-xs text-red-600">
-        {errors.email?.message || emailError}
-      </p>
-    )}  
-</div>
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      placeholder="Enter your email address"
+                      type="email"
+                      disabled={emailVerified}
+                      {...register("email")}
+                      className={errors.email || emailError ? "border-red-500" : ""}
+                    />
+                    {(errors.email || emailError) && (
+                      <p className="text-xs text-red-600">
+                        {errors.email?.message || emailError}
+                      </p>
+                    )}
+                  </div>
 
-{/* EMAIL VERIFICATION */}
-<div className="space-y-2">
-  <p className="text-sm text-gray-600">Email Verification (optional)</p>
+                  {/* EMAIL VERIFICATION */}
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Email Verification (optional)</p>
 
-  {!emailOtpSent && (
-    <Button
-      type="button"
-      onClick={handleSendEmailOtp}
-      disabled={emailOtpLoading || emailTimer > 0}
-      variant="outline"
-      className="w-full sm:w-fit bg-purple-600 hover:bg-purple-700 text-white"
-    >
-      {emailOtpLoading ? "Sending..." : "Send OTP(for email verification)"}
-    </Button>
-  )}
+                    {!emailOtpSent && (
+                      <Button
+                        type="button"
+                        onClick={handleSendEmailOtp}
+                        disabled={emailOtpLoading || emailTimer > 0}
+                        variant="outline"
+                        className="w-full sm:w-fit bg-purple-600 hover:bg-purple-700 cursor-pointer text-white"
+                      >
+                        {emailOtpLoading ? "Sending..." : "Send OTP(for email verification)"}
+                      </Button>
+                    )}
 
-  {/* {emailError && <p className="text-xs text-red-600">{emailError}</p>} */}
+                    {/* {emailError && <p className="text-xs text-red-600">{emailError}</p>} */}
 
-  {emailOtpSent && !emailVerified && (
-    <>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Input
-          placeholder="Enter 6 digit OTP"
-           maxLength={6}       
-          value={emailOtp}
-          onChange={(e) => setEmailOtp(e.target.value)}
-        />
-        <Button
-          type="button"
-          onClick={verifyEmail}
-          disabled={verifying}
-          variant="outline"
-          className="bg-purple-600 text-white hover:bg-purple-700"
-        >
-          Verify
-        </Button>
-      </div>
+                    {emailOtpSent && !emailVerified && (
+                      <>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Input
+                            placeholder="Enter 6 digit OTP"
+                            maxLength={6}
+                            value={emailOtp}
+                            onChange={(e) => setEmailOtp(e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            onClick={verifyEmail}
+                            disabled={verifying}
+                            variant="outline"
+                            className="bg-purple-600 text-white hover:bg-purple-700"
+                          >
+                            Verify
+                          </Button>
+                        </div>
 
-      {emailOtpError && (
-        <p className="text-xs text-red-600">{emailOtpError}</p>
-      )}
+                        {emailOtpError && (
+                          <p className="text-xs text-red-600">{emailOtpError}</p>
+                        )}
 
-      {emailTimer > 0 ? (
-        <p className="text-xs text-gray-500">
-          Resend OTP in {emailTimer}s
-        </p>
-      ) : (
-        <button
-          type="button"
-          onClick={sendEmailOtp}
-          className="text-xs text-purple-600 hover:underline"
-        >
-          Resend OTP
-        </button>
-      )}
-    </>
-  )}
+                        {emailTimer > 0 ? (
+                          <p className="text-xs text-gray-500">
+                            Resend OTP in {emailTimer}s
+                          </p>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={sendEmailOtp}
+                            className="text-xs text-purple-600 hover:underline"
+                          >
+                            Resend OTP
+                          </button>
+                        )}
+                      </>
+                    )}
 
-  {emailVerified && (
-    <p className="text-sm text-green-600 font-medium">
-      ✔ Email verified
-    </p>
-  )}
-</div>
+                    {emailVerified && (
+                      <p className="text-sm text-green-600 font-medium">
+                        ✔ Email verified
+                      </p>
+                    )}
+                  </div>
 
                   {/* <div className="space-y-2">
                     <Label htmlFor="profession">Profession</Label>
@@ -695,9 +758,10 @@ const handleSendEmailOtp = async () => {
                   <Label htmlFor="address">Full Address</Label>
                   <textarea
                     id="address"
+                    placeholder="Enter your complete address"
                     {...register("address")}
                     rows={3}
-                    className={`w-full px-3 py-2 border-2 rounded-md focus:ring-2 focus:ring-purple-500 ${errors.address ? "border-red-500" : "border-gray-300"
+                    className={`w-full px-3 py-2 border-1 rounded-md focus:ring-2 focus:ring-black ${errors.address ? "border-red-500" : "border-black"
                       }`}
                   />
                   {errors.address && (
@@ -816,35 +880,59 @@ const handleSendEmailOtp = async () => {
 
 
                 <div className="space-y-2">
-                  <Label htmlFor="uploadIdProof">Upload ID Proof</Label>
-                  <input
-                    id="uploadIdProof"
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileChange}
-                    className="hidden"
+                  <Label htmlFor="uploadIdProof">Upload ID Proof *</Label>
+
+                  <Controller
+                    name="idProof"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          id="uploadIdProof"
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            field.onChange(file);      // 🔥 RHF gets the file
+                            handleFileChange(e);       // your existing logic
+                          }}
+                        />
+
+                        <div className={`flex items-center border rounded-md overflow-hidden relative
+          ${errors.idProof ? "border-red-500" : "border-gray-300"}`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById("uploadIdProof").click()}
+                            className="bg-purple-50 text-purple-700 font-semibold px-4 py-2 text-sm hover:bg-purple-100"
+                          >
+                            Choose File
+                          </button>
+
+                          <span className="flex-1 px-3 text-gray-600 text-sm truncate select-none">
+                            {uploadedFile ? uploadedFile.name : "No file chosen"}
+                          </span>
+
+                          <div className="absolute right-3 pointer-events-none">
+                            <Upload className="h-5 w-5 text-gray-400" />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   />
-                  <div className="flex items-center border border-gray-300 rounded-md overflow-hidden relative">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        document.getElementById("uploadIdProof").click()
-                      }
-                      className="bg-purple-50 text-purple-700 font-semibold px-4 py-2 text-sm hover:bg-purple-100"
-                    >
-                      Choose File
-                    </button>
-                    <span className="flex-1 px-3 text-gray-600 text-sm truncate select-none">
-                      {uploadedFile ? uploadedFile.name : "No file chosen"}
-                    </span>
-                    <div className="absolute right-3 pointer-events-none">
-                      <Upload className="h-5 w-5 text-gray-400" />
-                    </div>
-                  </div>
+
+                  {errors.idProof && (
+                    <p className="text-red-500 text-xs">
+                      {errors.idProof.message}
+                    </p>
+                  )}
+
                   <p className="text-xs text-gray-500">
                     Accepted formats: PDF, JPG, JPEG, PNG (Max 5MB)
                   </p>
                 </div>
+
               </div>
 
               {/* Why Join Us */}
@@ -890,7 +978,7 @@ const handleSendEmailOtp = async () => {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
+                  className="w-full bg-purple-600 hover:bg-purple-700 cursor-pointer text-white py-3 text-lg font-semibold disabled:opacity-50"
                 >
                   {isSubmitting ? "Registering..." : "Register as Volunteer"}
                 </Button>

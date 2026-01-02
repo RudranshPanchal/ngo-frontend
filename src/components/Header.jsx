@@ -163,7 +163,7 @@ const Header = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="hidden sm:flex items-center cursor-pointer gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2"
+                  className="hidden sm:flex items-center cursor-pointer gap-2 bg-amber-800 text-white hover:bg-amber-900 px-3 py-2"
                 >
                   <User className="h-4 w-4" />
                   <span className="font-medium text-sm">Login</span>
