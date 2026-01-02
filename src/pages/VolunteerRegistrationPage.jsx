@@ -491,7 +491,7 @@ const handleSendEmailOtp = async () => {
       disabled={phoneOtpLoading || phoneTimer > 0}
       className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-fit"
     >
-      {phoneOtpLoading ? "Sending..." : "Send OTP(for pone verification)"}
+      {phoneOtpLoading ? "Sending..." : "Send OTP(for phone verification)"}
     </Button>
   )}
 
