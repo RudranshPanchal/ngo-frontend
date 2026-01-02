@@ -14,9 +14,8 @@ function FundRaising() {
 
 
   return (
-    <div className="w-full flex flex-col items-center gap-6">
-
-      {/* Bigger Back Button - LEFT */}
+     <div className="w-full flex flex-col items-center gap-6 px-4">
+      {/* Back Button Section */}
       <div className="w-full max-w-2xl flex justify-start">
         <Link
           to="/"
@@ -28,116 +27,94 @@ function FundRaising() {
       </div>
 
       {loading ? (
-        <p className="text-center mt-10 text-gray-600 text-lg">
-          Loading fundraising cards...
-        </p>
+        <p className="text-center mt-10 text-gray-600 text-lg">Loading fundraising cards...</p>
       ) : (
         cards.map((item) => (
           <Card
             key={item._id}
-            className="mt-10 max-w-3xl p-6 w-full bg-white shadow-2xl rounded-xl border"
+          className="mt-6 md:mt-10 max-w-3xl p-6 w-full shadow-2xl shadow-[0_35px_120px_-30px_rgba(0,0,0,0.3)] rounded-xl border border-orange-200 bg-gradient-to-br from-orange-300 via-peach-300 to-rose-300"
           >
-            <div className="flex gap-6 w-full">
-              {/* LEFT */}
-              <div className="w-40">
-                <div className="w-40 flex flex-col items-center">
-                  {/* IMAGE */}
+            <div className="flex flex-col md:flex-row gap-6 w-full items-center md:items-start">
+
+              {/* LEFT SECTION (Photo & Identity) */}
+              <div className="w-full md:w-40 flex flex-col items-center shrink-0">
+                <div className="w-32 md:w-40 overflow-hidden rounded-lg shadow-sm bg-gray-100">
                   <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
+                    src={item.image}
                     alt={item.name}
                     loading="lazy"
-                    className="w-40 h-40 object-cover rounded-lg shadow-sm"
+                    className="w-full h-auto max-h-48 md:max-h-52 object-contain bg-gray-50"
                   />
-
-                  {/* NAME &  CITY */}
-                  <div className="mt-3 text-center flex flex-col min-h-[70px] justify-between">
-                    <CardTitle className="text-lg font-semibold leading-tight">
-                      {item.name}
-                    </CardTitle>
-                    <p className="text-gray-500 text-sm">{item.city}</p>
-                  </div>
-
-                  {/* PAYMENT — ALWAYS BOTTOM, NEVER MOVES */}
-                  <p className="font-bold text-sm mt-2">RS -  ₹ {item.payment}</p>
                 </div>
 
+                <div className="mt-3 text-center flex flex-col min-h-[60px] justify-center">
+                  <CardTitle className="text-lg font-bold leading-tight">
+                    {item.name}
+                  </CardTitle>
+                  <p className="text-black-500 text-sm">{item.city}</p>
+                </div>
+                <p className="font-bold text-sm mt-1 text-blue-700">RS - ₹ {item.payment}</p>
               </div>
 
-              {/* RIGHT */}
-              <div className="flex flex-col justify-between flex-1">
-                <CardContent className="p-0 mt-2">
-                  <div className=" overflow-y-auto bg-gray-50 p-3  rounded-lg shadow-sm border text-sm text-gray-700 h-30">
+              {/* RIGHT SECTION (Description, Tags & Button) */}
+              <div className="flex flex-col flex-1 w-full text-center md:text-left items-center md:items-stretch">
+                <CardContent className="p-0 mt-2 w-full">
+                  <div className="overflow-y-auto bg-gray-50 p-3 rounded-lg shadow-sm border text-sm text-gray-700 min-h-[80px] max-h-36 italic">
                     {item.description}
                   </div>
                 </CardContent>
 
-                <CardContent className="p-0 mt-4">
-                  <div className="flex gap-3 flex-wrap justify-center">
+                <CardContent className="p-0 mt-4 w-full flex flex-col items-center">
+                  {/* TAGS: Center align for both PC and Mobile as per your request */}
+                  <div className="flex gap-2 flex-wrap justify-center mb-5">
                     {item.tags?.map((tag, index) => (
                       <span
                         key={index}
-                        className="py-1 px-3 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-full shadow-sm cursor-pointer"
+                        className="py-1 px-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] md:text-xs rounded-full shadow-sm"
                       >
                         #{tag}
                       </span>
                     ))}
                   </div>
-                  <div className="flex justify-center mt-5">
+
+                  {/* BUTTON: Centered on both devices */}
+                  <div className="flex justify-center w-full">
                     <Link
                       to="/donor-registration"
-                      state={{
-                        fundraisingId: item._id,
-                        presetAmount: "", // empty so input ENABLE rahe
-                      }}
-
+                      className="w-full flex justify-center"
+                      state={{ fundraisingId: item._id, presetAmount: "" }}
                     >
                       <Button
-                        className="w-60 py-3 bg-orange-500 hover:bg-orange-600 text-white text-lg rounded-lg shadow-md"
+                        className="w-full md:w-64 py-3 bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold rounded-lg shadow-md"
                       >
                         Donate Now
                       </Button>
-
                     </Link>
-
                   </div>
 
-                  <div className="mt-5">
+                  {/* PROGRESS BAR */}
+                  <div className="mt-6 w-full max-w-md md:max-w-full">
                     {(() => {
-                      const progress = Math.min(item.payment / 100, 100);
+                      const goal = Number(item.limit) || 0;
+                      const paid = Number(item.payment) || 0;
+                      const progress = goal > 0 ? (paid / goal) * 100 : 0;
+                      const safeProgress = Math.min(progress, 100);
 
                       return (
                         <>
-                          <div className="mt-5">
-                            {(() => {
-                              const goal = Number(item.limit) || 0;
-                              const paid = Number(item.payment) || 0;
-
-                              const progress = goal > 0 ? (paid / goal) * 100 : 0;
-
-                              return (
-                                <>
-                                  <div className="flex justify-between mb-1">
-                                    <span className="text-sm font-semibold text-gray-700"></span>
-                                    <span className="text-sm font-semibold text-gray-700">
-                                      Goal: ₹{goal}
-                                    </span>
-                                  </div>
-
-                                  <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
-                                    <div
-                                      className="bg-green-500 h-3 rounded-full"
-                                      style={{ width: `${Math.min(progress, 100)}%` }}
-                                    />
-                                  </div>
-
-                                  <p className="text-sm text-center mt-1 text-gray-600 font-medium">
-                                    {Math.floor(Math.min(progress, 100))}% Completed
-                                  </p>
-                                </>
-                              );
-                            })()}
+                          <div className="flex justify-between mb-1 px-1">
+                            <span className="text-[10px] uppercase font-bold text-black-400">Progress</span>
+                            <span className="text-sm font-bold text-gray-800">Goal: ₹{goal}</span>
                           </div>
-
+                          <div className="w-full bg-gray-200 rounded-full h-2.5 shadow-inner overflow-hidden">
+                            <div
+                              className="bg-green-500 h-full transition-all duration-700 ease-in-out"
+                              style={{ width: `${safeProgress}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-center mt-1.5 text-gray-600 font-bold">
+                            {Math.floor(safeProgress)}% Completed
+                          </p>
                         </>
                       );
                     })()}
@@ -148,10 +125,9 @@ function FundRaising() {
           </Card>
         ))
       )}
-
-
     </div>
   );
+
 }
 
 export default FundRaising;

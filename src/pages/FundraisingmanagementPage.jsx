@@ -12,6 +12,7 @@ const FundraisingManagementPage = () => {
   const [activeTab, setActiveTab] = useState("fundraising-management");
   const [showForm, setShowForm] = useState(false);
   const [editFund, setEditFund] = useState(null);
+const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { funds, loading, createFund, updateFund, deleteFund } =
     useFundraisingAdmin();
@@ -35,16 +36,27 @@ const FundraisingManagementPage = () => {
   
 
   // SUBMIT FORM
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  // ⛔ double submit guard
+  if (isSubmitting) return;
+
+  setIsSubmitting(true);
+
+  try {
     const fd = new FormData();
     fd.append("name", form.name);
     fd.append("city", form.city);
     fd.append("payment", form.payment);
     fd.append("limit", form.limit);
     fd.append("description", form.description);
-    fd.append("tags", JSON.stringify(form.tags.split(",").map((t) => t.trim())));
+
+    const tagsToSend = typeof form.tags === "string"
+      ? form.tags.split(",").map((t) => t.trim())
+      : form.tags;
+
+    fd.append("tags", JSON.stringify(tagsToSend));
 
     if (form.image && typeof form.image !== "string") {
       fd.append("image", form.image);
@@ -58,17 +70,13 @@ const FundraisingManagementPage = () => {
 
     setShowForm(false);
     setEditFund(null);
+  } catch (err) {
+    console.error("Submit failed:", err);
+  } finally {
+    setIsSubmitting(false); // ✅ unlock
+  }
+};
 
-    setForm({
-      name: "",
-      city: "",
-      payment: "",
-      limit: "",
-      image: null,
-      description: "",
-      tags: "",
-    });
-  };
 
   const handleEdit = (fund) => {
     setEditFund(fund);
@@ -143,7 +151,7 @@ const confirmDelete = async () => {
                           <tr key={item._id} className="border-b hover:bg-gray-50">
                             <td className="p-3">
                               <img
-                                src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
+                                src={item.image}
                                 className="w-14 h-14 rounded object-cover border"
                               />
                             </td>
@@ -254,16 +262,16 @@ const confirmDelete = async () => {
                 </p>
 
                 {/* PREVIEW */}
-                {form.image && (
-                  <img
-                    src={
-                      typeof form.image === "string"
-                        ? `${import.meta.env.VITE_BACKEND_URL}/${form.image}`
-                        : URL.createObjectURL(form.image)
-                    }
-                    className="w-28 h-28 rounded object-cover mt-3 border shadow"
-                  />
-                )}
+               {form.image && (
+  <img
+    src={
+      typeof form.image === "string"
+        ? form.image // ✨ Cloudinary ke liye sirf itna kaafi hai
+        : URL.createObjectURL(form.image) // Nayi file ke liye same rahega
+    }
+    className="w-28 h-28 rounded object-cover mt-3 border shadow"
+  />
+)}
               </div>
 
               {/* DESCRIPTION */}
@@ -293,7 +301,7 @@ const confirmDelete = async () => {
                 <Button variant="secondary" onClick={() => setShowForm(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                <Button type="submit" className="bg-green-600 hover:bg-green-700"  disabled={isSubmitting}>
                   {editFund ? "Update" : "Create"}
                 </Button>
               </div>
